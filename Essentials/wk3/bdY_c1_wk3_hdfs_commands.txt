@@ -1,0 +1,36 @@
+﻿###EX2
+
+cd $HADOOP_PREFIX
+export YARN_HOME=$HADOOP_PREFIX
+
+OUT_DIR="gaio_output/wordcount_result_"$(date +"%s%6N")
+NUM_REDUCERS=8
+
+bin/hdfs dfs -rm -r -skipTrash ${OUT_DIR} > /dev/null
+
+bin/yarn $HADOOP_PREFIX/share/hadoop/tools/lib/hadoop-streaming-2.7.0.jar \
+    -D mapred.jab.name="Streaming wordCount" \
+    -D mapreduce.job.reduces=1 \
+    -mapper "python bdY_c1_wk3_ex2_mapper.py" \
+    -files bdY_c1_wk3_ex2_mapper.py \
+    -input /usr/local/hadoop/gaio_files \
+    -output ${OUT_DIR} > /dev/null
+
+hdfs dfs -cat ${OUT_DIR}/part-00000 | head
+
+
+bin/hadoop jar share/hadoop/tools/lib/hadoop-streaming-2.7.0.jar \
+-file /mnt/hadoopData/mapper.py \
+-mapper ‘python bdY_c1_wk3_ex2_mapper.py’ \
+-file /mnt/hadoopData/reducer.py \
+-reducer ‘python reducer.py’ \
+-input /user/hduser/cd/ \
+-output /user/hduser/cd-output/
+
+20180508
+http://msoliman.me/2017/04/24/hadoop-inside-docker-the-easiest-way-in-5-minutes/
+docker run --hostname=quickstart.cloudera --privileged=true -t -i  -p 8888:8888 -p 7180:7180 -p 80:80 -p 50070:50070 -v $(pwd):/home/cloudera -w /home/cloudera cloudera/quickstart /usr/bin/docker-quickstart
+
+20180513
+https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
+https://stackoverflow.com/questions/18497688/run-a-docker-image-as-a-container
